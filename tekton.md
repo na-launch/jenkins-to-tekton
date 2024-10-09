@@ -1,9 +1,106 @@
-<!--
----
-linkTitle: "Pipelines"
-weight: 203
----
--->
+# Tekton Pipeline 
+
+A **Tekton pipeline** is a Kubernetes-native CI/CD (Continuous Integration and Continuous Delivery) framework that allows you to define, manage, and run pipelines for automating software delivery processes. It provides a set of Kubernetes resources for creating and managing pipelines, enabling developers to define the steps involved in building, testing, and deploying applications in a Kubernetes environment.
+
+Tekton is an open-source project that is designed to be flexible, scalable, and extensible, built with Kubernetes as its foundation. It integrates with various tools and services commonly used in DevOps pipelines, such as Docker, Helm, Git, and more.
+
+### Key Components of a Tekton Pipeline:
+
+1. **Pipeline**: 
+   - The top-level resource that defines the sequence of tasks (steps) that are executed in a defined order. It specifies the overall flow of the pipeline, which typically includes steps like build, test, and deploy.
+   
+   Example:
+   ```yaml
+   apiVersion: tekton.dev/v1beta1
+   kind: Pipeline
+   metadata:
+     name: my-pipeline
+   spec:
+     tasks:
+       - name: build
+         taskRef:
+           name: build-task
+       - name: test
+         taskRef:
+           name: test-task
+       - name: deploy
+         taskRef:
+           name: deploy-task
+   ```
+
+2. **PipelineRun**: 
+   - Represents the execution of a pipeline. When you create a `PipelineRun`, it triggers the pipeline, running the defined tasks in the specified order.
+
+   Example:
+   ```yaml
+   apiVersion: tekton.dev/v1beta1
+   kind: PipelineRun
+   metadata:
+     name: my-pipeline-run
+   spec:
+     pipelineRef:
+       name: my-pipeline
+   ```
+
+3. **Task**:
+   - A fundamental unit of work within a Tekton pipeline. Each task can contain multiple steps, which are essentially containers that execute commands.
+   - Tasks can be reused across multiple pipelines and can be composed of any number of steps (like building an image, testing code, or deploying to a cluster).
+   
+   Example of a Task definition:
+   ```yaml
+   apiVersion: tekton.dev/v1beta1
+   kind: Task
+   metadata:
+     name: build-task
+   spec:
+     steps:
+       - name: build
+         image: golang:1.16
+         script: |
+           echo "Building the app..."
+           go build -o myapp
+   ```
+
+4. **PipelineResource** (deprecated in newer versions, replaced by PipelineParams/Results):
+   - Used to define inputs and outputs for tasks. PipelineResources could represent things like Git repositories, Docker images, or storage locations.
+   - Example: A `PipelineResource` might represent a Git repository containing the source code or a Docker image for a base image.
+
+5. **PipelineParams**:
+   - Parameters that can be passed into tasks or pipelines, allowing dynamic control over pipeline execution.
+
+6. **PipelineResults**:
+   - Outputs produced by tasks that can be used by other tasks or stored for later.
+
+7. **Triggers** (optional):
+   - Tekton allows you to set up triggers that automatically start pipelines based on events, such as a Git push, a pull request, or a change in a container registry.
+
+### How Tekton Works:
+1. **Pipeline**: Defines a sequence of tasks.
+2. **Task**: Contains steps that run inside containers.
+3. **PipelineRun**: Executes the pipeline and all the tasks defined within it.
+4. **Triggers**: (optional) Respond to external events, like code pushes.
+
+### Example Pipeline Workflow:
+
+- **Step 1**: A developer pushes code to a Git repository.
+- **Step 2**: Tekton Trigger automatically starts a **PipelineRun** that references the defined pipeline.
+- **Step 3**: The pipeline executes, starting with the `build-task`, followed by the `test-task`, and finally the `deploy-task`.
+
+### Benefits of Using Tekton Pipelines:
+- **Kubernetes Native**: Tekton is built for Kubernetes, meaning it leverages Kubernetes' scalability, reliability, and management features.
+- **Flexible and Modular**: Each task can be defined independently and reused across multiple pipelines, allowing for modular and flexible pipelines.
+- **Extensible**: Tekton can easily integrate with other tools and services like Docker, Helm, and external CI/CD systems.
+- **Kubernetes Resources**: Tekton uses Kubernetes constructs (such as CRDs), making it easy to manage, monitor, and scale pipelines in a Kubernetes environment.
+- **Cloud-Native**: Tekton is designed for cloud-native workflows, making it suitable for modern CI/CD workflows in cloud environments.
+
+### Tekton vs Jenkins Pipeline:
+
+- **Infrastructure**: Tekton is Kubernetes-native, while Jenkins pipelines are often run in traditional CI/CD systems (although Jenkins can run in Kubernetes).
+- **Scalability**: Tekton leverages Kubernetes' native scaling capabilities, while Jenkins pipelines require additional configuration for scaling.
+- **Complexity**: Tekton can be more complex to set up, but it offers a high degree of customization and cloud-native advantages, while Jenkins pipelines are more straightforward to configure for smaller or simpler projects.
+- **Event-Driven**: Tekton supports triggers for event-based automation (like Git push), which Jenkins can also do but may require additional plugins or configurations.
+
+In conclusion, **Tekton pipelines** provide a powerful and flexible way to implement CI/CD in a Kubernetes-centric environment, offering native support for Kubernetes, scalability, and modularity in pipeline design. It's a great fit for cloud-native applications and organizations already using Kubernetes.
 
 # Pipelines
 
