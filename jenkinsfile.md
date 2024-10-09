@@ -1,3 +1,5 @@
+# Jenkins Pipeline 
+
 A **Jenkins pipeline** is a set of automated processes in Jenkins, a popular open-source automation server, that allows you to define the stages and steps of your software delivery process (like building, testing, and deploying code) in a continuous integration/continuous delivery (CI/CD) pipeline. Jenkins pipelines are used to automate the workflow of building, testing, and deploying applications in a repeatable, efficient, and consistent manner.
 
 There are two main types of Jenkins pipelines:
