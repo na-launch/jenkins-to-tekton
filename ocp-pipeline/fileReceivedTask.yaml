@@ -6,7 +6,7 @@ metadata:
 spec:
   params:
     - default: 'nourl'
-      name: url
+      name: gitrepositoryurl
       type: string
   results:
     - description: The precise URL that was fetched by this Task.
@@ -23,5 +23,5 @@ spec:
       command:
         - echo
       args:
-        - "In task 1 $(params.url)"
+        - "In task 1 $(params.gitrepositoryurl)"
   
