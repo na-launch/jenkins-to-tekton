@@ -5,5 +5,7 @@ metadata:
   namespace: ai-odyssey
 spec:
   params:
-  - name: filereceived
-    value: $(body.filereceived)
+  - name: gitrevision
+    value: $(body.gitrevision)
+  - name: gitrepositoryurl
+    value: $(body.gitrepositoryurl)
