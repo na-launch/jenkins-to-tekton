@@ -5,8 +5,10 @@ metadata:
   namespace: ai-odyssey
 spec:
   params:
-    - default: 'nourl'
-      name: gitrepositoryurl
+    # - default: 'nourl'
+    #   name: gitrepositoryurl
+    #   type: string
+    - name: url
       type: string
   results:
     - description: The precise URL that was fetched by this Task.
@@ -23,5 +25,5 @@ spec:
       command:
         - echo
       args:
-        - "In task 1 $(params.gitrepositoryurl)"
+        - "In task 1 $(params.url)"
   

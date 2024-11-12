@@ -16,6 +16,10 @@ spec:
         name: triggered-$(uid)
       spec:
         params:
+          - name: p-x
+            value: "100"
+          - name: p-y
+            value: "500"
           - name: revision
             value: $(tt.params.gitrevision)
           - name: url
