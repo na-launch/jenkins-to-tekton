@@ -1,0 +1,21 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerTemplate
+metadata:
+  name: triggertemplate1
+  namespace: ai-odyssey
+spec:
+  params:
+  - name: filereceived
+  resourcetemplates:
+    - apiVersion: tekton.dev/v1beta1
+      kind: PipelineRun
+      metadata:
+        labels:
+          tekton.dev/pipeline: pipeline-received
+        name: pipeline-received-triggered-$(uid)
+      spec:
+        params:
+          - name: file-received
+            value: $(tt.params.filereceived)
+        pipelineRef:
+          name: pipeline-received

@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: pipeline-received
+  namespace: ai-odyssey
+spec:
+  tasks:
+    - name: file-received-event-task
+      taskRef:
+        kind: Task
+        name: file-received-event-task
+  finally:
+    - name: file-received-finisher-task
+      taskRef:
+        kind: Task
+        name: file-received-finisher-task

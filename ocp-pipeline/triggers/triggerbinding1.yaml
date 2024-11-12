@@ -1,0 +1,9 @@
+apiVersion: triggers.tekton.dev/v1beta1
+kind: TriggerBinding
+metadata:
+  name: triggerbinding1
+  namespace: ai-odyssey
+spec:
+  params:
+  - name: filereceived
+    value: $(body.filereceived)

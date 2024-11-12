@@ -1,0 +1,3 @@
+oc get pr                               # gets the current pipelines in use
+oc get service                          # gets the current services running (important for event listener) #default created is el-eventlistener1
+oc logs -f svc/el-eventlistener1        # watchers for incoming traffic
