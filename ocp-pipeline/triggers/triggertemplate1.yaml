@@ -13,11 +13,11 @@ spec:
       metadata:
         labels:
           tekton.dev/pipeline: pipeline-received
-        name: pipeline-received-triggered-$(uid)
+        name: triggered-$(uid)
       spec:
         params:
-          # - name: revision
-          #   value: $(tt.params.gitrevision)
+          - name: revision
+            value: $(tt.params.gitrevision)
           # - name: url
           #   value: $(tt.params.gitrepositoryurl)
         pipelineRef:
