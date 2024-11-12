@@ -6,6 +6,6 @@ metadata:
 spec:
   params:
   - name: gitrevision
-    value: $(body.gitrevision)
+    value: $(body.repository.clone_url)
   - name: gitrepositoryurl
-    value: $(body.gitrepositoryurl)
+    value: $(body.pull_request.head.sha)

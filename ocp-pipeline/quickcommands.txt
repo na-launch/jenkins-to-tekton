@@ -11,6 +11,10 @@ Route               |   oc apply -f ./routes/eventlistenerRoute.yaml
 
 TESTING:
 Open up Postman or any API mgmt tool
+or;
+git commit -a -m "build commit" --allow-empty           #this triggers the webhook
+
+
 
 URL: http://route-aiodyssey-ai-odyssey.apps.cluster-r6s5g.r6s5g.sandbox2145.opentlc.com
 Content-type : application/json

@@ -16,9 +16,9 @@ spec:
         name: pipeline-received-triggered-$(uid)
       spec:
         params:
-          - name: gitrevision
+          - name: revision
             value: $(tt.params.gitrevision)
-          - name: gitrepositoryurl
+          - name: url
             value: $(tt.params.gitrepositoryurl)
         pipelineRef:
           name: pipeline-received
