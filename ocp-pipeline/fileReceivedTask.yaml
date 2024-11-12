@@ -4,10 +4,17 @@ metadata:
   name: file-received-event-task
   namespace: ai-odyssey
 spec:
+  params:
+    - default: 'nourl'
+      name: url
+      type: string
+  results:
+    - description: The precise URL that was fetched by this Task.
+      name: url
   steps:
     - name: id
       image: registry.access.redhat.com/ubi8/ubi:latest
-      command:
+      command:  
         - cat
       args:
         - /etc/redhat-release
@@ -16,5 +23,5 @@ spec:
       command:
         - echo
       args:
-        - "In task 1"
+        - "In task 1 $(params.url)"
   
