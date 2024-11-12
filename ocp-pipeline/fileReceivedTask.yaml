@@ -8,7 +8,7 @@ spec:
     # - default: 'nourl'
     #   name: gitrepositoryurl
     #   type: string
-    - name: url
+    - name: p-y
       type: string
   results:
     - description: The precise URL that was fetched by this Task.
@@ -25,5 +25,5 @@ spec:
       command:
         - echo
       args:
-        - "In task 1 $(params.url)"
+        - "In task 1 $(params.p-y)"
   
