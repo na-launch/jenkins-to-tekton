@@ -6,7 +6,7 @@ metadata:
 spec:
   params:
   - name: gitrevision
-  - name: gitrepositoryurl
+  # - name: gitrepositoryurl
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -18,7 +18,7 @@ spec:
         params:
           - name: revision
             value: $(tt.params.gitrevision)
-          - name: url
-            value: $(tt.params.gitrepositoryurl)
+          # - name: url
+          #   value: $(tt.params.gitrepositoryurl)
         pipelineRef:
           name: pipeline-received
