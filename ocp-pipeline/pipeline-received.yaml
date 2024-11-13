@@ -14,7 +14,8 @@ spec:
         name: file-received-event-task
       params:
         - name: revision
-          value: $(params.revision)
+          #value: $(params.revision)
+          value: "V2.2.2"
   finally:
     - name: file-received-finisher-task
       taskRef:
