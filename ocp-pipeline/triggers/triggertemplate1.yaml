@@ -15,7 +15,6 @@ spec:
         labels:
           tekton.dev/pipeline: pipeline-received
         name: triggered-$(uid)
-      
       params:
       - name: repo-url
         value: $(tt.params.repo-url)
