@@ -4,12 +4,6 @@ metadata:
   name: file-received-event-task
   namespace: ai-odyssey
 spec:
-  params:
-    # - default: 'nourl'
-    #   name: gitrepositoryurl
-    #   type: string
-    - name: p-y
-      type: string
   results:
     - description: The precise URL that was fetched by this Task.
       name: url
@@ -25,5 +19,5 @@ spec:
       command:
         - echo
       args:
-        - "In task 1 $(params.p-y)"
+        - "In task 1"
   
