@@ -23,5 +23,5 @@ spec:
       command:
         - echo
       args:
-        - "In task 1 $(params.revision)"
+        - "Received Webhook from:  $(params.revision)"
   

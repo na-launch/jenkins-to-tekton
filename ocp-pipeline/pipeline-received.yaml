@@ -15,7 +15,6 @@ spec:
       params:
         - name: revision
           value: $(params.revision)
-          #value: "V2.2.2"
   finally:
     - name: file-received-finisher-task
       taskRef:
