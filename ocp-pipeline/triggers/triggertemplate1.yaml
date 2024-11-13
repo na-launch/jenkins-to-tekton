@@ -5,9 +5,8 @@ metadata:
   namespace: ai-odyssey
 spec:
   params:
-  - name: revision
-    default: main
-  - name: repo-url
+  - name: gitrevision
+  - name: gitrepositoryurl
   resourcetemplates:
     - apiVersion: tekton.dev/v1beta1
       kind: PipelineRun
@@ -15,8 +14,11 @@ spec:
         labels:
           tekton.dev/pipeline: pipeline-received
         name: triggered-$(uid)
-      params:
-      - name: repo-url
-        value: $(tt.params.repo-url)
-      - name: revision
-        value: $(tt.params.revision)
+      spec:
+        params:
+          - name: revision
+            value: $(tt.params.gitrevision)
+          - name: url
+            value: $(tt.params.gitrepositoryurl)
+        pipelineRef:
+          name: pipeline-received
