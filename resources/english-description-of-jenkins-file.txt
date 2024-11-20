@@ -1,0 +1,12 @@
+The pipeline then consists of three stages: Build, Quality Analysis, and Build and Publish  
+Image. Each stage has its own agent configuration, defining where the jobs will run, be it  
+on a specific agent or any available one.                                                   
+                                                                                            
+The 'Build' stage uses Maven to clean, run findbugs analysis, and package the application.  
+If the build steps are successful, it archives the target jar file. The 'Quality Analysis'  
+stage runs integration tests and Sonar Scan in parallel, using different agents for each    
+task.                                                                                       
+                                                                                            
+Finally, the 'Build and Publish Image' stage is executed only on the master branch. It      
+builds a Docker image with the defined IMAGE and VERSION tags and pushes it to a registry.  
+The pipeline concludes by notifying users via email when a failure occurs.  
