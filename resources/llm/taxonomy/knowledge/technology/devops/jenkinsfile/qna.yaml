@@ -1,0 +1,345 @@
+version: 3
+domain: jenkinsfile
+created_by: gmccarth
+seed_examples:
+  - context: |
+      What is a Jenkins Pipeline?
+      Jenkins Pipeline (or simply "Pipeline") is a suite of plugins which supports implementing and integrating continuous delivery pipelines into Jenkins.
+      A continuous delivery pipeline is an automated expression of your process for getting software from version control right through to your users and customers.
+      Jenkins Pipeline provides an extensible set of tools for modeling simple-to-complex delivery pipelines "as code". The definition of a Jenkins Pipeline is typically written into a text file (called a Jenkinsfile) which in turn is checked into a project’s source control repository.
+    questions_and_answers:
+      - question: |
+          What is a Jenkins Pipeline?
+        answer: |
+          Jenkins Pipeline (or simply "Pipeline") is a suite of plugins which supports implementing and integrating continuous delivery pipelines into Jenkins.
+      - question: |
+          What does a Jenkins pipeline provide?
+        answer: |
+          Jenkins Pipeline provides an extensible set of tools for modeling simple-to-complex delivery pipelines "as code".
+      - question: |
+          What is the file called that contains a Jenkins pipeline ?
+        answer: |
+          Jenkins Pipeline is typically written into a text file called a Jenkinsfile.
+  - context: |
+      #!/usr/bin/env groovy
+      pipeline {
+        /*
+         * Run everything on an existing agent configured with a label 'docker'.
+         * This agent will need docker, git and a jdk installed at a minimum.
+         */
+        agent {
+          node {
+              label 'docker'
+          }
+        }
+        // using the Timestamper plugin we can add timestamps to the console log
+        options {
+          timestamps()
+        }
+        environment {
+          //Use Pipeline Utility Steps plugin to read information from pom.xml into env variables
+          IMAGE = readMavenPom().getArtifactId()
+          VERSION = readMavenPom().getVersion()
+        }
+        stages {
+          stage('Build') {
+              agent {
+                  docker {
+                    /*
+                     * Reuse the workspace on the agent defined at top-level of Pipeline but run inside a container.
+                     * In this case we are running a container with maven so we don't have to install specific versions
+                     * of maven directly on the agent
+                     */
+                      reuseNode true
+                      image 'maven:3.5.0-jdk-8'
+                  }
+              }
+              steps {
+                // using the Pipeline Maven plugin we can set maven configuration settings, publish test results, and annotate the Jenkins console
+                  withMaven(options: [findbugsPublisher(), junitPublisher(ignoreAttachments: false)]) {
+                      sh 'mvn clean findbugs:findbugs package'
+                  }
+              }
+              post {
+                  success {
+                      // we only worry about archiving the jar file if the build steps are successful
+                      archiveArtifacts(artifacts: '**/target/*.jar', allowEmptyArchive: true)
+                  }
+              }
+          }
+          stage('Quality Analysis') {
+              parallel {
+                  // run Sonar Scan and Integration tests in parallel. This syntax requires Declarative Pipeline 1.2 or higher
+                  stage('Integration Test') {
+                      agent any  //run this stage on any available agent
+                      steps {
+                            echo 'Run integration tests here...'
+                      }
+                  }
+                  stage('Sonar Scan') {
+                      agent {
+                          docker {
+                              // we can use the same image and workspace as we did previously
+                              reuseNode true
+                              image 'maven:3.5.0-jdk-8'
+                          }
+                      }
+                      environment {
+                          //use 'sonar' credentials scoped only to this stage
+                          SONAR = credentials('sonar')
+                      }
+                      steps {
+                          sh 'mvn sonar:sonar -Dsonar.login=$SONAR_PSW'
+                      }
+                  }
+              }
+           }
+          stage('Build and Publish Image') {
+              when {
+                  branch 'master'  //only run these steps on the master branch
+              }
+              steps {
+                /*
+                 * Multiline strings can be used for larger scripts. It is also possible to put scripts in your shared library
+                 * and load them with 'libaryResource'
+                 */
+                  sh """
+            docker build -t ${IMAGE} .
+            docker tag ${IMAGE} ${IMAGE}:${VERSION}
+            docker push ${IMAGE}:${VERSION}
+          """
+              }
+          }
+        }
+        post {
+          failure {
+              // notify users when the Pipeline fails
+              mail to: 'team@example.com',
+                      subject: "Failed Pipeline: ${currentBuild.fullDisplayName}",
+                      body: "Something is wrong with ${env.BUILD_URL}"
+          }
+        }
+      }
+    questions_and_answers:
+      - question: |
+          How many stages in the Jenkins pipeline?
+        answer: |
+          This pipleline has 3 main stages, namely: "Build", "Quality Analysis" and "Buid and Publish Image". Stage "Quality Analysis" has two sub-stages that run in parallel: Integration Test and Sonar Scan
+      - question: |
+          What environment variables does this pipeline have?
+        answer: |
+          This pipeline has IMAGE, VERSION and SONAR as environment variables
+      - question: |
+          What frameworks are used in this pipeline?
+        answer: |
+          This pipeline makes use of Maven.
+      - question: |
+          What happens if the pipeline fails?
+        answer: |
+          If the pipeline fails, it will notify users via an email to team@example.com
+  - context: |
+          #!/usr/bin/env groovy
+          pipeline {
+            agent any
+
+            stages {
+              stage("Build") {
+                steps {
+                  sh 'mvn -v'
+                }
+              }
+              stage("Testing") {
+                parallel {
+                  stage("Unit Tests") {
+                    agent { docker 'openjdk:7-jdk-alpine' }
+                    steps {
+                      sh 'java -version'
+                    }
+                  }
+                  stage("Functional Tests") {
+                    agent { docker 'openjdk:8-jdk-alpine' }
+                    steps {
+                      sh 'java -version'
+                    }
+                  }
+                  stage("Integration Tests") {
+                    steps {
+                      sh 'java -version'
+                    }
+                  }
+                }
+              }
+              stage("Deploy") {
+                steps {
+                  echo "Deploy!"
+                }
+              }
+            }
+          }
+    questions_and_answers:
+      - question: |
+          How many stages in the Jenkins pipeline?
+        answer: |
+          This pipleline has 3 main stages, namely: "Build", "Testing" and "Deploy". Stage "Testing" has two sub-stages that run in parallel: "Functional Tests" and "Integration Tests"
+      - question: |
+          What environment variables does this pipeline have?
+        answer: |
+          This pipeline does not have any environment variables
+      - question: |
+          What happens in the "Testing" stage?
+        answer: |
+          In the "Testing" stage, two stages are run in parallel, namely "Functional Tests" and "Integation Tests"
+  - context: |
+      #!/usr/bin/env groovy
+      pipeline {
+          agent any
+          environment {
+              POM_VERSION = readMavenPom().getVersion()
+              BUILD_RELEASE_VERSION = readMavenPom().getVersion().replace("-SNAPSHOT", "")
+              IS_SNAPSHOT = readMavenPom().getVersion().endsWith("-SNAPSHOT")
+              GIT_TAG_COMMIT = sh(script: 'git describe --tags --always', returnStdout: true).trim()
+          }
+          stages {
+              stage('stage one') {
+                  steps {
+                      script {
+                          tags_extra = "value_1"
+                      }
+                      echo "tags_extra: ${tags_extra}"
+                  }
+              }
+              stage('stage two') {
+                  steps {
+                      echo "tags_extra: ${tags_extra}"
+                  }
+              }
+              stage('stage three') {
+                  when {
+                      expression { tags_extra != 'bla' }
+                  }
+                  steps {
+                      echo "tags_extra: ${tags_extra}"
+                  }
+              }
+          }
+      }
+    questions_and_answers:
+      - question: |
+          How many stages in the Jenkins pipeline?
+        answer: |
+          This pipleline has 3 main stages, namely: "stage one", "stage two" and "stage three".
+      - question: |
+          What environment variables does this pipeline have?
+        answer: |
+          This pipeline has the following environment variables: POM_VERSION, BUILD_RELEASE_VERSION, IS_SNAPSHOT and GIT_TAG_COMMIT
+      - question: |
+          What happens in the "stage three" stage?
+        answer: |
+          There is a conditional clause in "stage three" that will only run the steps if the expression 'tags_extra' is not equal to 'bla'
+  - context: |
+      #!/usr/bin/env groovy
+      pipeline {
+         agent any
+         environment {
+            VALUE_ONE = '1'
+            VALUE_TWO = '2'
+            VALUE_THREE = '3'
+         }
+         stages {
+            // skip a stage while creating the pipeline
+            stage("A stage to be skipped") {
+               when {
+                  expression { false }  //skip this stage
+               }
+               steps {
+                  echo 'This step will never be run'
+               }
+            }
+            // Execute when branch = 'master'
+            stage("BASIC WHEN - Branch") {
+               when {
+                  branch 'master'
+           }
+               steps {
+                  echo 'BASIC WHEN - Master Branch!'
+               }
+            }
+            // Expression based when example with AND
+            stage('WHEN EXPRESSION with AND') {
+               when {
+                  expression {
+                     VALUE_ONE == '1' && VALUE_THREE == '3'
+                  }
+               }
+               steps {
+                  echo 'WHEN with AND expression works!'
+               }
+            }
+            // Expression based when example
+            stage('WHEN EXPRESSION with OR') {
+               when {
+                  expression {
+                     VALUE_ONE == '1' || VALUE_THREE == '2'
+                  }
+               }
+               steps {
+                  echo 'WHEN with OR expression works!'
+               }
+            }
+            // When - AllOf Example
+            stage("AllOf") {
+              when {
+                  allOf {
+                      environment name:'VALUE_ONE', value: '1'
+                      environment name:'VALUE_TWO', value: '2'
+                  }
+              }
+              steps {
+                  echo "AllOf Works!!"
+              }
+            }
+            // When - Not AnyOf Example
+            stage("Not AnyOf") {
+               when {
+                  not {
+                     anyOf {
+                        branch "development"
+                        environment name:'VALUE_TWO', value: '4'
+                     }
+                  }
+               }
+               steps {
+                  echo "Not AnyOf - Works!"
+               }
+            }
+         }
+      }
+    questions_and_answers:
+      - question: |
+          How many stages in the Jenkins pipeline?
+        answer: |
+          This pipleline has 6 stages.
+      - question: |
+          What environment variables does this pipeline have?
+        answer: |
+          This pipeline has 3 environment variables: VALUE_ONE, VALUE_TWO and VALUE_THREE
+      - question: |
+          What does a 'when' expression do in a Jankinsfile?
+        answer: |
+          In a Jenkinsfile, when expressions are used to control execution of stages or steps based
+          on certain conditions. They allow you to specify criteria such as branch names, build
+          status, and environment variables that will determine whether a stage or step should be
+          executed or skipped. When an expression evaluates to true, the corresponding code block is
+          executed; otherwise, it is ignored. This helps in creating flexible workflows where stages
+          can run under specific conditions without repeating logic across multiple scripts.
+      - question: |
+          Will stage "A stage to be skipped" run?
+        answer: |
+          No, stage "A stage to be skipped" will never run because the 'when' condition is permanently set to false. This means the stage cannot run.
+document_outline: |
+  Information about Jenkinsfiles and descriptions of what is included within various Jenkinsfiles.
+document:
+  repo: https://github.com/na-launch/jenkins-to-tekton
+  commit: 95b3f2d
+  patterns:
+    - jenkinsfile.md
