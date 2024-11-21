@@ -1,0 +1,280 @@
+version: 3
+created_by: na-launch
+domain: devops
+seed_examples:
+  - context: |
+      Tekton Pipelines is an open-source project that allows users to configure and run continuous
+      integration and continuous delivery (CI/CD) pipelines within a Kubernetes cluster.
+      Tekton Pipelines are defined in YAML files, which are typically stored in a Git repository.
+    questions_and_answers:
+      - question: What is a Jenkins Pipeline?
+        answer: |
+          A Jenkins pipeline is a set of automated processes in Jenkins, a popular open-source automation
+          server, that allows you to define the stages and steps of your software delivery process (like
+          building, testing, and deploying code) in a continuous integration/continuous delivery (CI/CD)
+          pipeline. Jenkins pipelines are used to automate the workflow of building, testing, and
+          deploying applications in a repeatable, efficient, and consistent manner.
+
+      - question: What is a Tekton Pipeline?
+        answer: |
+          A Tekton pipeline is a Kubernetes-native CI/CD (Continuous Integration and Continuous
+          Delivery) framework that allows you to define, manage, and run pipelines for automating
+          software delivery processes. It provides a set of Kubernetes resources for creating and
+          managing pipelines, enabling developers to define the steps involved in building, testing,
+          and deploying applications in a Kubernetes environment.
+
+      - question: How can Tekton help with scaling the CI/CD pipelines that Jenkins may struggle with?
+        answer: |
+          Tekton natively runs on Kubernetes, meaning it benefits from Kubernetes built-in scaling
+          and resource management capabilities. Unlike Jenkins, which may require additional
+          setup (like managing multiple Jenkins agents), Tekton pipelines can scale automatically
+          by running tasks in parallel across multiple pods in the Kubernetes cluster.
+          This means:
+          - **Elastic Scalability**: As the demand grows (more code commits, more builds), Tekton
+            can spin up more pods to handle the increased load.
+          - **Resource Efficiency**: Tekton allows you to define resource limits (CPU/memory)
+            for each task, making it easier to optimize resource usage.
+          - **Faster Execution**: Since tasks are containerized and Kubernetes manages the execution
+            across nodes, Tekton pipelines can potentially run faster than Jenkins pipelines, which
+            may require manual resource management or additional infrastructure like Jenkins agents.
+
+      - question: How do Jenkins pipeline stages translate to Tekton pipelines?
+        answer: |
+          In Jenkins, pipelines are defined in stages, and each stage contains steps that perform
+          the actual work. In Tekton, pipelines are similarly defined in stages, but they are
+          called **tasks**, and each task runs in a separate Kubernetes pod. Here's how you can
+          map Jenkins pipeline stages to Tekton tasks:
+          - **Jenkins Stage** → **Tekton Task**:
+            Each Jenkins stage becomes a Tekton task. For example, a `build` stage in Jenkins
+            would become a `build-task` in Tekton. Each task can be modular and reused in other pipelines.
+          - **Jenkins Steps** → **Tekton Task Steps**:
+            In Jenkins, a stage contains individual steps (e.g., commands or scripts). In Tekton,
+            each step in a task represents a container running a command or script. Tekton tasks
+            can contain multiple steps, each defined with its own container.
+          - **Jenkins Pipeline Environment Variables** → **Tekton PipelineParams**:
+            Jenkins environment variables used within stages can be translated into **PipelineParams**
+            in Tekton, which allow passing values between tasks.
+          Example:
+          Jenkins pipeline stage:
+          ```groovy
+              stage('Build') {
+                steps {
+                  script {
+                    sh 'make build'
+                  }
+                }
+              }
+          ```
+          Tekton task:
+          ```yaml
+            apiVersion: tekton.dev/v1beta1
+            kind: Task
+            metadata:
+              name: build-task
+            spec:
+              steps:
+                - name: build
+                  image: golang:1.16
+                  script: |
+                    make build
+          ```
+      - question: How do pipeline triggers work in Tekton compared to Jenkins?
+        answer: |
+          In Jenkins, triggers are typically set up through **webhooks** or cron jobs. A webhook
+          is used to trigger a Jenkins job when something happens (e.g., a code commit). Jenkins
+          also supports cron-based triggers for scheduled builds.
+          In Tekton, pipeline triggers are more event-driven and use the **Tekton Triggers**
+          component. Tekton Triggers allow you to define events.
+  - context: |
+      Tekton Pipelines provides a framework to create CI/CD pipelines using Kubernetes resources.
+      It breaks down pipelines into reusable, customizable components such as tasks and steps, which
+      allows developers to manage their software delivery processes efficiently and scalably.
+    questions_and_answers:
+      - question: What is a Task in Tekton?
+        answer: |
+          A Task in Tekton is a collection of sequential steps, defined as containerized commands or
+          scripts, that perform specific actions within a pipeline. Tasks are Kubernetes resources
+          and can be reused across different pipelines, making them modular and efficient.
+
+      - question: How do you define parameters for a Tekton Task?
+        answer: |
+          Tekton allows you to define parameters in a Task specification, which can be passed
+          dynamically at runtime. Parameters are defined in the `params` field of the Task YAML, where
+          each parameter has a `name` and an optional `default` value. This makes tasks flexible, allowing
+          users to customize task behavior without modifying the Task definition.
+
+      - question: How does Tekton ensure tasks are executed in the correct order?
+        answer: |
+          Tekton uses the Pipeline resource to define the sequence and dependency between tasks.
+          Within a Pipeline, tasks are ordered by specifying `runAfter` or by defining conditions
+          in `when` expressions, ensuring that tasks are only executed once their dependencies
+          are met, allowing for ordered and conditional execution.
+
+      - question: Can Tekton tasks run in parallel, and if so, how?
+        answer: |
+          Yes, Tekton tasks can run in parallel by omitting dependencies between tasks in a Pipeline.
+          If tasks don’t have `runAfter` or dependency conditions set, they can execute concurrently,
+          allowing the pipeline to complete more quickly. Parallel execution is automatically managed
+          by Kubernetes, with each task running in its own pod.
+
+      - question: How do you monitor pipeline runs in Tekton?
+        answer: |
+          Tekton provides CLI and dashboard tools to monitor pipeline runs. The `tkn` CLI allows
+          users to view the status of pipeline and task runs from the command line, while the
+          Tekton Dashboard offers a graphical interface to monitor active and completed pipeline
+          runs, view logs, and troubleshoot any failures.
+
+  - context: |
+      Tekton Triggers enable event-driven execution of Tekton Pipelines, allowing users to trigger
+      pipelines based on events such as Git commits, pull requests, or other external events.
+    questions_and_answers:
+      - question: What is a Tekton Trigger and why is it used?
+        answer: |
+          A Tekton Trigger is a configuration that enables event-driven execution of Tekton pipelines.
+          Triggers listen for external events (e.g., a GitHub webhook) and start pipelines in response,
+          making it easy to automate workflows based on external changes or scheduled events.
+
+      - question: How does Tekton use EventListeners with Triggers?
+        answer: |
+          An EventListener in Tekton listens for incoming events and routes them to a TriggerTemplate.
+          The EventListener acts as an HTTP endpoint that receives events (e.g., webhooks from Git),
+          and, based on the event, it can start pipelines by using TriggerBindings to map event data
+          to pipeline parameters.
+
+      - question: What is a TriggerBinding in Tekton?
+        answer: |
+          A TriggerBinding in Tekton is used to map fields from an incoming event payload to parameters
+          in a TriggerTemplate. TriggerBindings extract specific data from the event (such as commit
+          information from a webhook) and pass it as input to the pipeline, making the pipeline reactive
+          to event details.
+
+      - question: How do you secure Tekton Triggers?
+        answer: |
+          Tekton Triggers can be secured by using authentication tokens for incoming events and setting
+          up RBAC policies. Authentication tokens ensure that only trusted sources can trigger pipelines,
+          while RBAC controls restrict access to resources within the Kubernetes cluster, safeguarding
+          the pipeline from unauthorized access.
+
+      - question: How can Tekton Triggers be used for GitOps workflows?
+        answer: |
+          In a GitOps workflow, Tekton Triggers can respond to repository changes, such as commits or
+          pull requests. By setting up a trigger on a Git repository webhook, pipelines can be configured
+          to deploy new application versions automatically when code changes are merged, enabling continuous
+          deployment directly from Git.
+
+  - context: |
+      Tekton allows pipelines to be customized with various input parameters and resources,
+      making it a flexible solution for diverse CI/CD workflows.
+    questions_and_answers:
+      - question: How can you pass custom parameters to a Tekton Pipeline?
+        answer: |
+          Custom parameters can be defined within a Tekton Pipeline as input fields, specified under
+          the `params` section in the Pipeline YAML. At runtime, users provide values for these
+          parameters, which can be passed to tasks in the pipeline, allowing for flexibility
+          and customization in each pipeline execution.
+
+      - question: What is a Workspace in Tekton, and how is it used?
+        answer: |
+          A Workspace in Tekton provides shared storage between tasks in a pipeline. Workspaces are
+          defined in the Pipeline and Task configurations, allowing tasks to share files or data
+          generated during the pipeline run, which is useful for passing build artifacts between
+          tasks.
+
+      - question: How does Tekton handle secrets, such as API keys, in pipelines?
+        answer: |
+          Tekton can securely handle secrets through Kubernetes Secrets. Users create a Kubernetes
+          Secret and then mount it into tasks by defining `secret` as an environment variable
+          or volume in the Task configuration, allowing pipelines to securely access sensitive data.
+
+      - question: How can Tekton be configured to pull source code from a Git repository?
+        answer: |
+          Tekton provides the `git-clone` Task, which clones a Git repository at the start of a pipeline.
+          By defining this Task with the repository URL and branch, Tekton pipelines can automatically
+          pull the latest code from Git before executing build, test, or deployment tasks.
+
+      - question: How do you use resources like images or artifacts between Tekton tasks?
+        answer: |
+          Tekton Pipelines can pass resources like images or build artifacts between tasks by using
+          PipelineResources or Workspaces. PipelineResources define artifacts like Docker images or
+          Git repositories that are shared across tasks, while Workspaces provide storage to pass
+          files between steps and tasks, facilitating inter-task data sharing.
+
+  - context: |
+      Tekton provides several CLI commands to interact with pipelines, monitor tasks, and troubleshoot
+      issues within a Kubernetes environment.
+    questions_and_answers:
+      - question: How do you view all pipelines in Tekton using the CLI?
+        answer: |
+          You can list all pipelines in Tekton using the `tkn pipeline list` command. This command
+          displays the pipelines available in the namespace, allowing users to review and manage
+          pipeline definitions within the cluster.
+
+      - question: How can you view the logs of a running task in Tekton?
+        answer: |
+          Tekton’s `tkn` CLI provides the `tkn taskrun logs` command, which streams the logs of a
+          running or completed task. Users specify the task name, and Tekton retrieves the output,
+          making it easier to debug and monitor task execution in real time.
+
+      - question: How do you start a Tekton pipeline using the CLI?
+        answer: |
+          A Tekton pipeline can be started using the `tkn pipeline start` command, followed by the
+          pipeline name and any necessary parameters. This command initiates a pipeline run,
+          prompting Tekton to execute the defined tasks in sequence or parallel as per the configuration.
+
+      - question: How do you check the status of a pipeline run in Tekton?
+        answer: |
+          The `tkn pipelinerun list` command shows the status of pipeline runs, displaying each run's
+          status, start time, and other details. Additionally, `tkn pipelinerun describe` provides
+          detailed information on a specific run, including the status of each task.
+
+      - question: How do you delete completed pipeline runs to save space?
+        answer: |
+          Tekton provides the `tkn pipelinerun delete` command to remove completed pipeline runs
+          from the system. This helps conserve storage and maintain a clean environment by clearing
+          old or unnecessary runs from the cluster.
+
+  - context: |
+      Tekton Pipelines can be integrated with other CI/CD tools like Jenkins, allowing teams to
+      leverage both Tekton’s Kubernetes-native capabilities and Jenkins’s existing ecosystem.
+    questions_and_answers:
+      - question: How can Tekton be integrated with Jenkins?
+        answer: |
+          Tekton can be integrated with Jenkins using plugins or by calling Tekton pipelines from
+          Jenkins scripts. This setup allows teams to manage CI/CD with Jenkins while offloading
+          containerized tasks to Tekton, leveraging Kubernetes for scalability and resource efficiency.
+
+      - question: What are the advantages of using Tekton in a Jenkins CI/CD pipeline?
+        answer: |
+          Tekton allows Jenkins users to offload resource-intensive or Kubernetes-native tasks,
+          enabling scalable builds directly on a Kubernetes cluster. This integration can improve
+          efficiency and provide Kubernetes-native CI/CD capabilities while maintaining Jenkins as
+          the primary CI tool.
+
+      - question: How can you call a Tekton pipeline from a Jenkins job?
+        answer: |
+          A Jenkins job can trigger a Tekton pipeline by using `kubectl` commands or Tekton’s CLI (`tkn`)
+          within Jenkins pipeline scripts. This integration allows Jenkins to start and monitor Tekton
+          pipelines as part of the Jenkins build process.
+
+      - question: How do Tekton and Jenkins differ in terms of task isolation?
+        answer: |
+          In Jenkins, tasks run within the Jenkins agent or master, often sharing resources. Tekton
+          tasks, however, are Kubernetes pods, isolated by the container runtime, providing greater
+          resource separation, scalability, and consistency in Kubernetes environments.
+
+      - question: What is the benefit of Tekton’s containerized task execution compared to Jenkins?
+        answer: |
+          Tekton’s containerized tasks benefit from Kubernetes resource management and isolation.
+          Each task runs in a separate pod, providing consistent environments, reducing dependency
+          conflicts, and allowing dynamic scaling, whereas Jenkins tasks often require setup for
+          isolated or containerized execution.
+
+document_outline: |
+  This document explains that how the description of a pipeline which is written in english can be converted into a yml file for tekton.
+
+document:
+  repo: https://github.com/na-launch/jenkins-to-tekton.git
+  commit: 95b3f2d64def840c682b1e6aaa939dc611daf3de
+  patterns:
+    - jenkins.md
+    - tekton.md
