@@ -13,7 +13,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: gitops/manifests/workload/openshift-minio/base/
+    path: gitops/manifests/workload/minio/base/
     repoURL: https://github.com/na-launch/jenkins-to-tekton.git
     targetRevision: main
   syncPolicy:
