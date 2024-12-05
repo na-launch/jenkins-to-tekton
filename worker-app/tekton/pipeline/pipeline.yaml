@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1
+kind: Pipeline
+metadata:
+  name: jnk2eng-pipeline
+spec:
+  tasks:
+    - name: load-json
+      taskRef:
+        kind: Task
+        name: load-json
+    - name: run-app
+      params:        
+        - name: json-string
+          value: $(tasks.load-json.results.output1)
+      runAfter:
+        - load-json
+      taskRef:
+        kind: Task
+        name: run-app

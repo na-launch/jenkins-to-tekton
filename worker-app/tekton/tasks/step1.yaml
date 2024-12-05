@@ -1,0 +1,16 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: load-json
+spec:
+  results:
+    - name: output1
+      description: Building the string
+  steps:
+    - name: step1
+      image: busybox
+      script: |
+        #!/bin/sh
+        #echo "Output is: SomeValue" > $(results.output1.path)
+        #echo ""{"id":"chatcmpl-7b1314b0-d241-4027-9000-27306e37e07f","object":"chat.completion","created":1733362999,"model":"/mnt/models/trained.gguf-Q4_K_M.gguf","choices":[{"index":0,"message":{"content":"\nThe Jenkinsfile provided stages in the following order:\n1. Build\n2. Testing\n3. Unit Tests\n4. Functional Tests\n5. Integration Tests\n6. Deploy\n\nEach stage is executed on a separate Jenkins agent, either an 'any' agent or a Docker container based on the specified environment (either 'openjdk:7-jdk-alpine' for unit tests and integration tests or 'openjdk:8-jdk-alpine' for functional tests). The Deploy stage is last and echoes \"Deploy!\".\n\nIn this Jenkinsfile, the stages are executed in parallel. However, you can modify the Jenkinsfile to run the stages sequentially by uncommenting the  parallel()  keyword before the  stage(\"Testing\")  stage and commenting it out.","role":"assistant"},"logprobs":null,"finish_reason":"stop"}],"usage":{"prompt_tokens":194,"completion_tokens":175,"total_tokens":369}}"" > $(results.output1.path)
+        echo "step 1 please sir"> $(results.output1.path)

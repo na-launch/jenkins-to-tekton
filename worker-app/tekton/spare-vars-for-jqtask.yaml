@@ -1,0 +1,18 @@
+ - name: jq
+      params:
+        - name: options
+          value: '-r'
+        - name: filter
+          value: '.choices[0].message.content'
+        - name: image
+          value: >-
+            quay.io/jpmaida1/jq@sha256:f90645c017ba8b1a2fff44309231cb7f8fd3a441690e17c15a53e60997f309c0
+        - name: input
+          value: $(tasks.curl-task.results.curl-output)
+        - name: stringOrFile
+          value: string
+      runAfter:
+        - curl-task
+      taskRef:
+        kind: Task
+        name: jq
