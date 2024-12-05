@@ -1,0 +1,22 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:  
+  name: get-jenkinsfile
+spec:  
+  results:
+    - description: The output of this Task.
+      name: jenkinsfile
+      type: string
+  steps:
+    - computeResources: {}
+      image: 'busybox'
+      name: getfile
+      script: |
+        #!/bin/sh
+        JENKINSFILE=$(cat /workspace/output/incoming/example2.jenkinsfile)
+        # echo "$JENKINSFILE" > $(results.jenkinsfile.path)
+        # echo "f: " $JENKINSFILE
+        echo "results.jenkinsfile.path: " $(results.jenkinsfile.path)
+  workspaces:
+    - description: The git repo will be cloned onto the volume backing this Workspace.
+      name: output

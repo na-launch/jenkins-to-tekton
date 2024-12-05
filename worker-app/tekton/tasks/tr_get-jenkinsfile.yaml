@@ -1,0 +1,12 @@
+apiVersion: tekton.dev/v1
+kind: TaskRun
+metadata:
+  name: tr-get-jenkinsfile
+spec:
+  taskRef:
+    name: get-jenkinsfile
+  workspaces:
+    - name: output
+      persistentVolumeClaim:
+        claimName: jnk2eng-pvc
+   

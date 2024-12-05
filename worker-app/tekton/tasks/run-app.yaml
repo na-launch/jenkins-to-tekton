@@ -1,0 +1,19 @@
+apiVersion: tekton.dev/v1
+kind: Task
+metadata:
+  name: run-app
+spec:
+  params:
+    - name: jenkinsFile
+      type: string
+  results:
+    - name: eng-desc-result
+      description: "Runs the node.js worker app that connects the ENGLISH (jnk2eng) and TEKTON (eng2tkn) servers, running in API"
+  steps:
+    - name: run-quay-image
+      image: quay.io/pknezevich/echo-app:latest
+      script: |
+          #!/bin/sh          
+
+          echo "Hello"
+          #/usr/local/bin/node app.js $(inputs.params.jenkinsFile)
