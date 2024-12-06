@@ -9,3 +9,6 @@ resources:
   - namespace.yaml
   - llamacpp-runtime-custom.yaml
   - create-s3-buckets-job.yaml
+  - htpasswd-secret.yaml
+  - oauth-config.yaml
+  - clusterrolebinding-admin.yaml
