@@ -49,7 +49,7 @@ async function sendJsonRequestToJnk2EngServer(bodyData) {
         let jsonResult = response.data;
         let scrub1 = JSON.stringify(jsonResult.choices[0].message.content).replace(/\\n/g, '');
         let final = scrub1.replace(/`/g, "\'");
-        console.log("\n\n--" + final +"\n--");
+        console.log("\n\n--\n" + final +"\n--");
         sendJsonRequestToEng2TektonServer(final);
     } catch (error) {
         console.error('Error:\n\n-----------------------\n', error);

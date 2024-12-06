@@ -15,5 +15,4 @@ spec:
       script: |
           #!/bin/sh
           echo $(inputs.params.jenkinsFile)
-          sleep 3600
-          #/usr/local/bin/node app.js $(inputs.params.jenkinsFile)
+          /usr/local/bin/node app.js $(inputs.params.jenkinsFile)
