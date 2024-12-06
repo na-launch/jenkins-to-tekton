@@ -4,6 +4,10 @@ labels:
   opendatahub.io/dashboard: "true"
 metadata:
   annotations:
+    opendatahub.io/accelerator-name: ''
+    opendatahub.io/apiProtocol: REST
+    opendatahub.io/template-display-name: LlamaCPP-latest
+    opendatahub.io/template-name: llamacpp-latest
     openshift.io/display-name: LlamaCPP-latest
   name: llamacpp-latest
   namespace: model-serving
@@ -26,3 +30,8 @@ spec:
   multiModel: false
   supportedModelFormats:
     - name: any
+  volumes:
+    - emptyDir:
+        medium: Memory
+        sizeLimit: 2Gi
+      name: shm
