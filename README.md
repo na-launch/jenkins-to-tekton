@@ -18,5 +18,4 @@ oc create -k gitops/manifests/cluster/bootstrap/base
 
 ### Idea and execution
 
-The execution workflow consists in ...
-
+The execution workflow consists in ....
