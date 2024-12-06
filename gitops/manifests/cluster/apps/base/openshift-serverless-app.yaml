@@ -13,7 +13,7 @@ spec:
     server: https://kubernetes.default.svc
   project: default
   source:
-    path: gitops/manifests/operators/openshift-serverless-operator/aggregate/default
+    path: gitops/manifests/operators/openshift-serverless-operator/overlays/stable
     repoURL: https://github.com/na-launch/jenkins-to-tekton.git
     targetRevision: main
   syncPolicy:
