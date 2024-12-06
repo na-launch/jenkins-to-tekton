@@ -9,12 +9,11 @@ const args = process.argv.slice(2); // Ignore first two default arguments (node 
 
 // Path to the Jenkinsfile
 const jenkinsfilePath = path.join(__dirname, args[0]);           //todo change this
+//const jenkinsfilePath = args[0];
 
 const urlJnk2eng = 'https://jenkins-to-english-test-model-serving.apps.demo.sandbox1298.opentlc.com/v1/chat/completions';
-
 const urleng2tkn = 'https://eng-tekton-model-serving.apps.demo.sandbox1298.opentlc.com/v1/chat/completions';
 process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
-
 
 // Read the Jenkinsfile
 fs.readFile(jenkinsfilePath, 'utf8', (err, data) => {
