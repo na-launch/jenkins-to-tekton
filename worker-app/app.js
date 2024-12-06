@@ -9,6 +9,7 @@ const args = process.argv.slice(2); // Ignore first two default arguments (node 
 
 // Path to the Jenkinsfile
 const jenkinsfilePath = path.join(__dirname, args[0]);           //todo change this
+const dummyTektonFilePath = path.join(__dirname, "/tekton/pipeline/p2.yaml");           //todo change this
 //const jenkinsfilePath = args[0];
 
 const urlJnk2eng = 'https://jenkins-to-english-test-model-serving.apps.demo.sandbox1298.opentlc.com/v1/chat/completions';
@@ -44,18 +45,18 @@ async function sendJsonRequestToJnk2EngServer(bodyData) {
                     'Content-Type': 'application/json',
                 },
             }
-        );                            
-        
+        );
+
         let jsonResult = response.data;
         let scrub1 = JSON.stringify(jsonResult.choices[0].message.content).replace(/\\n/g, '');
         let final = scrub1.replace(/`/g, "\'");
-        console.log("\n\n--\n" + final +"\n--");
+        console.log("\n\n--\n" + final + "\n--");
         sendJsonRequestToEng2TektonServer(final);
     } catch (error) {
         console.error('Error:\n\n-----------------------\n', error);
     }
 }
-   
+
 async function sendJsonRequestToEng2TektonServer(bodyData) {
     console.log("\n\n --\n Sending Jenkins file to ENG2TEK Server -- \n\n");
     try {
@@ -63,12 +64,12 @@ async function sendJsonRequestToEng2TektonServer(bodyData) {
             urleng2tkn,
             {
                 "messages": [
-                  {
-                    "content": "Create a Tekton pipeline using the following description: " + bodyData,
-                    "role": "user"
-                  }
+                    {
+                        "content": "Create a Tekton pipeline using the following description: " + bodyData,
+                        "role": "user"
+                    }
                 ]
-              },
+            },
             {
                 headers: {
                     'Content-Type': 'application/json',
@@ -79,6 +80,14 @@ async function sendJsonRequestToEng2TektonServer(bodyData) {
         let scrub1 = JSON.stringify(jsonResult.choices[0].message.content).replace(/\\n/g, '');
         console.log(scrub1);
     } catch (error) {
-        console.error('Error:', error);
+        // console.error('Error:', error);
+        // Read the Jenkinsfile
+        fs.readFile(dummyTektonFilePath, 'utf8', (err, data) => {
+            if (err) {
+                console.error('Error reading Tektonfile:', err);
+                return;
+            }
+            console.log(data);
+        });
     }
 }
