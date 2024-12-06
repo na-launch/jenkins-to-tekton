@@ -8,3 +8,4 @@ commonAnnotations:
 resources:
   - namespace.yaml
   - llamacpp-runtime-custom.yaml
+  - create-s3-buckets-job.yaml
