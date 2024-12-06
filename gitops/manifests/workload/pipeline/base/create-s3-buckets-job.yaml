@@ -1,0 +1,31 @@
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: create-s3-buckets-job
+  namespace: minio-server
+spec:
+  template:
+    spec:
+      containers:
+        - name: minio-client
+          image: minio/mc:latest
+          command:
+            - /bin/sh
+            - -c
+            - |
+              export MC_CONFIG_DIR=/tmp/.mc
+              mc alias set myminio "http://minio-service.minio-server.svc.cluster.local:9000" minio minio123
+              mc mb myminio/pipeline-results
+              mc anonymous set public myminio/pipeline-results
+              echo "Bucket pipeline-results created successfully."
+              mc mb myminio/ai-odyssey-llms
+              mc anonymous set public myminio/ai-odyssey-llms
+              echo "Bucket ai-odyssey-llms created successfully."              
+          volumeMounts:
+                - name: tmp-mc-config
+                  mountPath: /tmp
+      volumes:
+        - name: tmp-mc-config
+          emptyDir: {}
+      restartPolicy: Never
+  backoffLimit: 4
