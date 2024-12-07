@@ -2,6 +2,7 @@ apiVersion: serving.kserve.io/v1alpha1
 kind: ServingRuntime
 metadata:
   annotations:
+    enable-route: 'true'
     opendatahub.io/accelerator-name: ''
     opendatahub.io/apiProtocol: REST
     opendatahub.io/template-display-name: LlamaCPP-latest
@@ -9,6 +10,8 @@ metadata:
     openshift.io/display-name: LlamaCPP-latest
   name: llamacpp-latest
   namespace: model-serving
+  labels:
+    opendatahub.io/dashboard: 'true'
 spec:
   containers:
     - image: quay.io/stauil/llamacpp-032:latest
