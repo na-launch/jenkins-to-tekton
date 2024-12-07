@@ -15,12 +15,18 @@ spec:
             - |
               export MC_CONFIG_DIR=/tmp/.mc
               mc alias set myminio "http://minio-service.minio-server.svc.cluster.local:9000" minio minio123
-              mc mb myminio/pipeline-results
+
+              # Create and validate the first bucket
+              mc mb myminio/pipeline-results || { echo "Failed to create pipeline-results bucket"; exit 1; }
+              mc ls myminio/pipeline-results > /dev/null || { echo "Bucket pipeline-results does not exist"; exit 1; }
               mc anonymous set public myminio/pipeline-results
-              echo "Bucket pipeline-results created successfully."
-              mc mb myminio/ai-odyssey-llms
+
+              # Create and validate the second bucket
+              mc mb myminio/ai-odyssey-llms || { echo "Failed to create ai-odyssey-llms bucket"; exit 1; }
+              mc ls myminio/ai-odyssey-llms > /dev/null || { echo "Bucket ai-odyssey-llms does not exist"; exit 1; }
               mc anonymous set public myminio/ai-odyssey-llms
-              echo "Bucket ai-odyssey-llms created successfully."              
+
+              echo "All buckets created successfully."              
           volumeMounts:
                 - name: tmp-mc-config
                   mountPath: /tmp
