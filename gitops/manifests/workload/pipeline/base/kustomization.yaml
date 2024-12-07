@@ -12,3 +12,11 @@ resources:
   - htpasswd-secret.yaml
   - oauth-config.yaml
   - clusterrolebinding-admin.yaml
+  - workspace-pvc.yaml
+  - trigger-binding.yaml
+  - trigger-template.yaml
+  - event-listener.yaml
+  - run-app-task.yaml
+  - pipeline-sa.yaml
+  - convertion-pipeline.yaml
+  - pipeline-el-route.yaml

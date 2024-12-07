@@ -1,0 +1,20 @@
+kind: Route
+apiVersion: route.openshift.io/v1
+metadata:
+  name: route-jenkins-receiver
+  namespace: model-serving
+  labels:
+    app.kubernetes.io/managed-by: EventListener
+    app.kubernetes.io/part-of: Triggers
+    eventlistener:  eventlistener-pipeline
+  annotations:
+    openshift.io/host.generated: 'true'
+spec:
+  to:
+    kind: Service
+    name: el-eventlistener-pipeline
+    weight: 100
+  port:
+    targetPort: http-listener
+  wildcardPolicy: None
+
